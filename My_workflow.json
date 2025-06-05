@@ -1,0 +1,197 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "const texto = $json[\"message\"][\"text\"].trim();\nconst fecha = new Date().toISOString().split('T')[0];\n\n// Verificar si el mensaje comienza con \"ingresos\"\nif (/^ingresos\\b/i.test(texto)) {\n  const ingresosMatch = texto.match(/(\\d+)/);\n  const ingresos = ingresosMatch ? parseInt(ingresosMatch[1]) : null;\n\n  return [{\n    json: {\n      Ingresos: ingresos,\n      Fecha_Ingresos: fecha\n    }\n  }];\n}\n\n// Si no empieza con \"ingresos\", extrae monto y acción\nconst montoMatch = texto.match(/(\\d+)/);\nconst monto = montoMatch ? parseInt(montoMatch[1]) : null;\nconst categoriaMatch = texto.match(/(?:en|de)\\s+(.+)/i);\nconst accion = categoriaMatch ? categoriaMatch[1].toLowerCase().trim() : \"sin categoría\";\n\nreturn [{\n  json: {\n    monto,\n    accion,\n    fecha\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        360,
+        0
+      ],
+      "id": "71d7c7a4-f3d5-48dd-895a-af936c4255cd",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "17gYpla7NYtuok9UiiaSZTQSxVz11nRKyMqd5_dEXjfY",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "0",
+          "mode": "id"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "monto",
+              "displayName": "monto",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "accion",
+              "displayName": "accion",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "fecha",
+              "displayName": "fecha",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Total ingresos",
+              "displayName": "Total ingresos",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Saldo disponible",
+              "displayName": "Saldo disponible",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Gastos",
+              "displayName": "Gastos",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Ingresos",
+              "displayName": "Ingresos",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha_Ingresos",
+              "displayName": "Fecha_Ingresos",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        660,
+        0
+      ],
+      "id": "841b97b9-eac6-4a8b-9ffe-2886f1c828b9",
+      "name": "Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "JivOlqrYLwI9WOnh",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "41de8dc5-148b-4b74-9cbd-56c309d47518",
+      "name": "Telegram Trigger",
+      "webhookId": "4e887db2-06c2-4a85-8dfa-a1854c26c833",
+      "notesInFlow": false,
+      "credentials": {
+        "telegramApi": {
+          "id": "ABJMAUyFDxBHOGA0",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "b89658ed-0014-4e8e-a988-20c77eaa195a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a3846acc10bef0968376cd4b5d806e620f79db1e26e6b1deb7b186891299d68c"
+  },
+  "id": "LObviuRmaKzu1nRH",
+  "tags": []
+}
